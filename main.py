@@ -1,6 +1,5 @@
 import itertools
 import random
-import time
 import os
 
 # TO DO
