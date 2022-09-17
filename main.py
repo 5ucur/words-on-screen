@@ -112,7 +112,7 @@ def print_game(word, perms):
     # Make a list from the word, to make it shufflable
     solution = list(word)
     # Clear the screen
-    os.system('clear')
+    os.system('cls' if os.name == 'nt' else 'clear')
     # Shuffle the word
     random.shuffle(solution)
     # Print the shuffled word
