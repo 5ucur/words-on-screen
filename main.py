@@ -5,6 +5,7 @@ import os
 # TO DO
 # Timer
 # Maybe make perms not a dict
+# Limit amount of permutations for each length
 
 # Prepare for making dicts
 dicts = {
