@@ -139,12 +139,23 @@ def print_game(word, perms):
         # Print it, separated by a space
         print('\t'.join(chunk))
 
-# Generate a solution and its permutations, for a level of difficulty (0 - 4)
+# Generate a solution and its permutations, for a level of difficulty (0 - 5)
 def generate(level = 0):
+    # For fake letters and mysterious letters
+    fake = 0
+    mysterious = 0
+    # In case the level argument is wrong
     if level < 0:
         level = 0
-    if level > 4:
+    # In the case of the levels with a fake letter
+    if level >= 5:
         level = 4
+        fake = 1
+    # In the case of the levels with an unknown letter
+    if level >= 6:
+        level = 4
+        fake = 1
+        mysterious = 1
     # Start with an empty dict of permutations
     perms = {}
     # As long as there are fewer than a minimal number of permutations
@@ -153,13 +164,26 @@ def generate(level = 0):
         solution = random.choice(bases[str(level+6)])
         # Generate its permutations
         perms = get_perms(solution)
+
+    # If the level has an unknown letter
+    if mysterious:
+        # Listify the solution string
+        solution = list(solution)
+        # Replace a random letter with a question mark
+        solution[random.randint(0, len(solution)-1)] = '?'
+        # Join the solution back into a string
+        solution = ''.join(solution)
+    # If the level has a fake letter
+    if fake:
+        # Add to the solution a random letter
+        solution += random.choice("abcdefghijklmnopqrstuvwxyz")
     # Return the generated elements
     return solution, perms
 
 # Main function
 if __name__ == "__main__":
     # Generate the solution and permutations
-    solution, perms = generate(4)
+    solution, perms = generate(5)
     # While not all of the words have been guessed
     # i.e. while there are still words with a guess value of zero
     while not all([val[1] for val in perms.values()]):
