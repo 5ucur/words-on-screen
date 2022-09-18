@@ -6,8 +6,9 @@ import os
 # Timer
 # Maybe make perms not a dict
 # Limit amount of permutations for each length
+# Add 'levels'
 
-# Prepare for making dicts
+# Prepare for loading guessable phrases by letter
 dicts = {
     'a': {}, 'b': {}, 'c': {}, 'd': {}, 'e': {}, 'f': {}, 'g': {}, 'h': {},
     'i': {}, 'j': {}, 'k': {}, 'l': {}, 'm': {}, 'n': {}, 'o': {}, 'p': {},
@@ -15,7 +16,10 @@ dicts = {
     'y': {}, 'z': {}
 }
 
-# Look in the dicts directory
+# Prepare for loading base words by length
+bases = {'6':[], '7':[], '8':[], '9':[], '10':[]}
+
+# Look in the phrases directory
 for file in os.listdir('phrases'):
     # Take the letter and number from the filename
     # The letter represents the first letter of the words in the file
@@ -27,10 +31,14 @@ for file in os.listdir('phrases'):
         # Take from it the words and put them in the corresponding dict
         dicts[let][num] = list(map(str.strip, current))
 
-# Open the file with basewords
-with open('bases') as bfile:
-    # Make a list of those words
-    bases = list(map(str.strip, bfile))
+# Look in the bases directory
+for file in os.listdir('bases'):
+    # Take the number from the filename, representing the length of the words
+    num = file.split('.')[0]
+    # Open that file
+    with open(os.path.join('bases', file)) as current:
+        # Take from it the words and put them in the corresponding list
+        bases[num] = list(map(str.strip, current))
 
 # Get all permutations of a string, if they are an accepted word
 def get_perms(string):
@@ -125,20 +133,24 @@ def print_game(word, perms):
     # Sort the permutations by length
     words = sorted(words, key=wordlen)
     # Split the permutations into chunk and transpose them
-    words = transpose(list(chunks(show_or_not(words), 4)))
+    words = transpose(list(chunks(show_or_not(words), 6)))
     # For each chunk
     for chunk in words:
         # Print it, separated by a space
-        print(' '.join(chunk))
+        print('\t'.join(chunk))
 
-# Generate a solution and its permutations
-def generate():
+# Generate a solution and its permutations, for a level of difficulty (0 - 4)
+def generate(level = 0):
+    if level < 0:
+        level = 0
+    if level > 4:
+        level = 4
     # Start with an empty dict of permutations
     perms = {}
     # As long as there are fewer than a minimal number of permutations
     while len(perms) < 4:
-        # Choose a random word
-        solution = random.choice(bases)
+        # Choose a random word from the appropriate list for the level 
+        solution = random.choice(bases[str(level+6)])
         # Generate its permutations
         perms = get_perms(solution)
     # Return the generated elements
@@ -147,7 +159,7 @@ def generate():
 # Main function
 if __name__ == "__main__":
     # Generate the solution and permutations
-    solution, perms = generate()
+    solution, perms = generate(4)
     # While not all of the words have been guessed
     # i.e. while there are still words with a guess value of zero
     while not all([val[1] for val in perms.values()]):
