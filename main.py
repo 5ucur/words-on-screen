@@ -6,7 +6,7 @@ import os
 # Timer
 # Maybe make perms not a dict
 # Limit amount of permutations for each length
-# Add 'levels'
+#  or let it generate ALL permutations possible 
 
 # Prepare for loading guessable phrases by letter
 dicts = {
@@ -39,6 +39,49 @@ for file in os.listdir('bases'):
     with open(os.path.join('bases', file)) as current:
         # Take from it the words and put them in the corresponding list
         bases[num] = list(map(str.strip, current))
+
+def get_summed_len(dct):
+    sumlen = 0
+    for lst in dct.values():
+        sumlen += len(lst)
+    return sumlen
+
+# An attempt at making a better permutation set builder
+def get_perms_new(string):
+    # Store a range for use twice later
+    lenrange = range(4, len(string)+1)
+
+    # Prepare the dict of sets for each permutation length
+    new = {str(length):set() for length in lenrange}
+
+    # For each possible length
+    for length in lenrange:
+        # Get permutations of that length
+        for perm in itertools.permutations(string, length):
+            # If the full length is less than a maximum number
+            if get_summed_len(new) < (len(string)-4)*10:
+                # If there are less than a maximum number
+                #  of permutations of that lenght
+                if len(new[str(len(perm))]) < 10:
+                    # Join the permutation into a string
+                    word = ''.join(perm)
+                    # If it's an acceptable word
+                    if word in dicts[perm[0]][str(len(word))]:
+                        # Put it into the corresponding set
+                        new[str(len(word))].add(word)
+
+    # Prepare a dict to return
+    to_return = {}
+    # Go through all the lists
+    for permlist in new.values():
+        # If there are permutations in the list
+        if permlist:
+            # Go through all the words in the list
+            for word in permlist:
+                # And add each into the dict with its three elements
+                to_return[word] = ['_'*len(word),0,word]  
+    # Return the dict
+    return to_return
 
 # Get all permutations of a string, if they are an accepted word
 def get_perms(string):
@@ -182,6 +225,9 @@ def generate(level = 0):
 
 # Main function
 if __name__ == "__main__":
+    #get_perms_new('overjoyed')
+    #exit()
+
     # Generate the solution and permutations
     solution, perms = generate(5)
     # While not all of the words have been guessed
